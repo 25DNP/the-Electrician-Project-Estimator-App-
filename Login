@@ -12,6 +12,7 @@
         justify-content: center;
         align-items: center;
         height: 100vh;
+        margin: 0;
     }
     .login-container {
         background-color: white;
@@ -31,6 +32,7 @@
         margin: 8px 0;
         border-radius: 5px;
         border: 1px solid #ccc;
+        box-sizing: border-box;
     }
     button {
         width: 100%;
@@ -41,6 +43,7 @@
         font-size: 16px;
         border-radius: 5px;
         cursor: pointer;
+        margin: 5px 0;
     }
     button:hover {
         background-color: #0056b3;
@@ -67,8 +70,29 @@
         font-size: 14px;
         display: block;
         margin: 5px 0;
-
-
+        border: 1px solid #007BFF;
+    }
+    .singh:hover {
+        background-color: #007BFF;
+        color: white;
+    }
+    .login-success {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+        border: 1px solid #c3e6cb;
+        display: none;
+    }
+    .login-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+        border: 1px solid #f5c6cb;
+        display: none;
     }
 </style>
 </head>
@@ -76,15 +100,19 @@
 
 <div class="login-container">
     <h2>Electrician Project Estimator</h2>
-    <form>
-        <input type="text" placeholder="Username" required>
-        <input type="password" placeholder="Password" required>
+    <div id="loginSuccess" class="login-success">
+        Login successful! Welcome to your project dashboard.
+    </div>
+    <div id="loginError" class="login-error">
+        Invalid username or password. Please try again.
+    </div>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Username" value="DN" required>
+        <input type="password" id="password" placeholder="Password" value="AWESOME" required>
         <button type="submit">Log In</button>   
     </form>
     <div class="links">
-        <button class="singh" onclick="signup()">Sign up </button>
-
-        
+        <button class="singh" onclick="signup()">Sign up</button>
     </div>
     
 </div>
@@ -92,9 +120,33 @@
     function signup(){
         window.open('CreateProfile.html')
     }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        
+        const successDiv = document.getElementById('loginSuccess');
+        const errorDiv = document.getElementById('loginError');
+        
+        // Reset displays
+        successDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        // Check credentials
+        if (username === 'DN' && password === 'AWESOME') {
+            successDiv.style.display = 'block';
+            // In a real app, you would redirect to the main dashboard
+            setTimeout(() => {
+                alert('Redirecting to project dashboard...');
+            }, 1500);
+        } else {
+            errorDiv.style.display = 'block';
+        }
+    });
 </script>
 </body>
 </html>
-
 
 
