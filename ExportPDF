@@ -20,4 +20,53 @@
         box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
         width: 300px;
     }
-    h2
+    h2 {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+    .checkbox-group {
+        margin: 10px 0;
+    }
+    label {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+    input[type="checkbox"] {
+        margin-right: 8px;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .btn-primary {
+        background-color: #007BFF;
+        color: white;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+</style>
+</head>
+<body>
+
+<div class="pdf-container">
+    <h2>Export as PDF</h2>
+    <form action="/pdf" method="POST">
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="include_totals" checked> Include totals</label>
+            <label><input type="checkbox" name="include_description" checked> Include job description</label>
+        </div>
+        <button type="submit" class="btn-primary">Download</button>
+    </form>
+</div>
+
+</body>
+</html>
