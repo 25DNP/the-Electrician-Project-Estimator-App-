@@ -5,68 +5,583 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Export as PDF - Electrician Project Estimator</title>
 <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     body {
         font-family: Arial, sans-serif;
         background-color: #f5f5f5;
         display: flex;
-        justify-content: center;
-        align-items: center;
         height: 100vh;
     }
+
+    /* Sidebar Styles */
+    .sidebar {
+        width: 80px;
+        background-color: #e8e8e8;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        position: fixed;
+        height: 100vh;
+        left: 0;
+        top: 0;
+    }
+
+    .nav-item {
+        width: 50px;
+        height: 50px;
+        background-color: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 10px 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #333;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .nav-item:hover {
+        background-color: #007BFF;
+        color: white;
+        transform: translateX(5px);
+    }
+
+    .nav-item.active {
+        background-color: #007BFF;
+        color: white;
+    }
+
+    .nav-item svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+    }
+
+    /* Main content */
+    .main-content {
+        margin-left: 80px;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
     .pdf-container {
         background-color: white;
-        padding: 20px;
+        padding: 30px;
         border-radius: 12px;
         box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
-        width: 300px;
+        width: 400px;
+        max-width: 100%;
     }
+
     h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #333;
+    }
+
+    .current-estimate {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #007BFF;
+    }
+
+    .estimate-title {
         font-size: 18px;
-        margin-bottom: 15px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
     }
+
+    .estimate-detail {
+        display: flex;
+        justify-content: space-between;
+        margin: 5px 0;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .estimate-total {
+        font-size: 18px;
+        font-weight: bold;
+        color: #007BFF;
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    .no-estimate {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+        padding: 20px;
+    }
+
     .checkbox-group {
-        margin: 10px 0;
+        margin: 20px 0;
     }
+
     label {
         display: flex;
         align-items: center;
         font-size: 14px;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         cursor: pointer;
+        color: #555;
     }
+
     input[type="checkbox"] {
-        margin-right: 8px;
+        margin-right: 12px;
+        transform: scale(1.2);
     }
+
     button {
         width: 100%;
-        padding: 12px;
+        padding: 14px;
         margin-top: 15px;
         font-size: 16px;
         border: none;
         border-radius: 6px;
         cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
     }
+
     .btn-primary {
         background-color: #007BFF;
         color: white;
     }
+
     .btn-primary:hover {
         background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    .btn-primary:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #545b62;
+    }
+
+    .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+        border: 1px solid #c3e6cb;
+        display: none;
+        text-align: center;
+    }
+
+    .pdf-preview {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 15px 0;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .project-completion-notice {
+        background-color: #e7f3ff;
+        border: 1px solid #b3d7ff;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 15px 0;
+        display: none;
+        text-align: center;
+    }
+
+    .project-completion-notice h4 {
+        color: #0056b3;
+        margin-bottom: 8px;
+    }
+
+    .project-completion-notice p {
+        color: #004085;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .view-recent-btn {
+        background-color: #28a745;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+
+    .view-recent-btn:hover {
+        background-color: #218838;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 60px;
+        }
+        .main-content {
+            margin-left: 60px;
+        }
+        .nav-item {
+            width: 40px;
+            height: 40px;
+        }
+        .pdf-container {
+            width: 90%;
+            padding: 20px;
+        }
     }
 </style>
 </head>
 <body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <a href="Dashboard.html" class="nav-item" title="Dashboard">
+            <svg viewBox="0 0 24 24">
+                <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+            </svg>
+        </a>
+        
+        <a href="JobEstimate.html" class="nav-item" title="Job Estimate">
+            <svg viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+        </a>
+        
+        <a href="ExportPDF.html" class="nav-item active" title="Export PDF">
+            <svg viewBox="0 0 24 24">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+            </svg>
+        </a>
 
-<div class="pdf-container">
-    <h2>Export as PDF</h2>
-    <form action="/pdf" method="POST">
-        <div class="checkbox-group">
-            <label><input type="checkbox" name="include_totals" checked> Include totals</label>
-            <label><input type="checkbox" name="include_description" checked> Include job description</label>
+        <a href="RecentProjects.html" class="nav-item" title="Recent Projects">
+            <svg viewBox="0 0 24 24">
+                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.2,16.2L11,13V7H12.5V12.2L17,14.9L16.2,16.2Z"/>
+            </svg>
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="pdf-container">
+            <h2>📄 Export Estimate PDF</h2>
+            
+            <div id="successMessage" class="success-message">
+                PDF generated successfully! Download started automatically.
+            </div>
+
+            <div id="projectCompletionNotice" class="project-completion-notice">
+                <h4>✅ Project Completed!</h4>
+                <p>Your project has been automatically added to Recent Projects for future reference.</p>
+                <a href="RecentProjects.html" class="view-recent-btn">📋 View Recent Projects</a>
+            </div>
+
+            <div id="currentEstimateSection">
+                <!-- This will be populated by JavaScript -->
+            </div>
+
+            <form id="pdfForm">
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="include_totals" checked> Include cost breakdown & totals</label>
+                    <label><input type="checkbox" id="include_description" checked> Include project description</label>
+                    <label><input type="checkbox" id="include_date" checked> Include date & time</label>
+                    <label><input type="checkbox" id="include_signature"> Include signature line</label>
+                </div>
+
+                <div class="pdf-preview" id="pdfPreview">
+                    <strong>PDF Preview:</strong><br>
+                    <span id="previewContent">Select options above to see what will be included...</span>
+                </div>
+                
+                <button type="submit" class="btn-primary" id="downloadBtn">📥 Generate & Download PDF</button>
+                <button type="button" class="btn-secondary" onclick="window.location.href='JobEstimate.html'">← Back to Estimate</button>
+            </form>
         </div>
-        <button type="submit" class="btn-primary">Download</button>
-    </form>
-</div>
+    </div>
 
+    <script>
+        // Load current estimate
+        let currentEstimate = JSON.parse(localStorage.getItem('currentEstimate') || '{}');
+        let currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+        function displayCurrentEstimate() {
+            const section = document.getElementById('currentEstimateSection');
+            
+            if (Object.keys(currentEstimate).length === 0) {
+                section.innerHTML = `
+                    <div class="no-estimate">
+                        No estimate found. Please create an estimate first.
+                    </div>
+                `;
+                document.getElementById('downloadBtn').disabled = true;
+                return;
+            }
+
+            section.innerHTML = `
+                <div class="current-estimate">
+                    <div class="estimate-title">${currentEstimate.projectName || 'Untitled Project'}</div>
+                    <div class="estimate-detail">
+                        <span>Materials:</span>
+                        <span>$${currentEstimate.materials.toFixed(2)}</span>
+                    </div>
+                    <div class="estimate-detail">
+                        <span>Labor (${currentEstimate.laborTime} hrs × $${currentEstimate.hourlyRate}):</span>
+                        <span>$${currentEstimate.laborCost.toFixed(2)}</span>
+                    </div>
+                    <div class="estimate-detail">
+                        <span>Subtotal:</span>
+                        <span>$${currentEstimate.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div class="estimate-detail">
+                        <span>Tax (8.5%):</span>
+                        <span>$${currentEstimate.taxAmount.toFixed(2)}</span>
+                    </div>
+                    <div class="estimate-total">
+                        Total: $${currentEstimate.total.toFixed(2)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function updatePreview() {
+            const includeTotals = document.getElementById('include_totals').checked;
+            const includeDescription = document.getElementById('include_description').checked;
+            const includeDate = document.getElementById('include_date').checked;
+            const includeSignature = document.getElementById('include_signature').checked;
+
+            let preview = '';
+            
+            if (Object.keys(currentEstimate).length > 0) {
+                preview += `Project: ${currentEstimate.projectName}<br>`;
+                
+                if (includeDescription) {
+                    preview += `Electrician: ${currentUser.name || 'Professional Electrician'}<br>`;
+                }
+                
+                if (includeDate) {
+                    preview += `Date: ${new Date().toLocaleDateString()}<br>`;
+                }
+                
+                if (includeTotals) {
+                    preview += `<br>Cost Breakdown:<br>`;
+                    preview += `• Materials: $${currentEstimate.materials.toFixed(2)}<br>`;
+                    preview += `• Labor: $${currentEstimate.laborCost.toFixed(2)}<br>`;
+                    preview += `• Tax: $${currentEstimate.taxAmount.toFixed(2)}<br>`;
+                    preview += `• <strong>Total: $${currentEstimate.total.toFixed(2)}</strong><br>`;
+                }
+                
+                if (includeSignature) {
+                    preview += `<br>Customer Signature: ________________<br>`;
+                }
+            } else {
+                preview = 'No estimate available';
+            }
+
+            document.getElementById('previewContent').innerHTML = preview;
+        }
+
+        function addToRecentProjects(estimate) {
+            // Get existing recent projects
+            let recentProjects = JSON.parse(localStorage.getItem('recentProjects') || '[]');
+            
+            // Create a completed project object with completion timestamp
+            const completedProject = {
+                ...estimate,
+                completedAt: new Date().toISOString(), // Mark when PDF was generated
+                status: 'completed',
+                pdfGenerated: true,
+                pdfGeneratedAt: new Date().toISOString()
+            };
+            
+            // Check if project already exists (avoid duplicates)
+            const existingProjectIndex = recentProjects.findIndex(p => p.id === estimate.id);
+            
+            if (existingProjectIndex !== -1) {
+                // Update existing project
+                recentProjects[existingProjectIndex] = completedProject;
+            } else {
+                // Add new project to the beginning of the array (most recent first)
+                recentProjects.unshift(completedProject);
+            }
+            
+            // Keep only the last 100 projects to avoid storage bloat
+            if (recentProjects.length > 100) {
+                recentProjects = recentProjects.slice(0, 100);
+            }
+            
+            // Save back to localStorage
+            localStorage.setItem('recentProjects', JSON.stringify(recentProjects));
+            
+            console.log('Project added to Recent Projects:', completedProject.projectName);
+            return completedProject;
+        }
+
+        function generatePDF() {
+            if (Object.keys(currentEstimate).length === 0) {
+                alert('No estimate found. Please create an estimate first.');
+                return;
+            }
+
+            const includeTotals = document.getElementById('include_totals').checked;
+            const includeDescription = document.getElementById('include_description').checked;
+            const includeDate = document.getElementById('include_date').checked;
+            const includeSignature = document.getElementById('include_signature').checked;
+
+            // Create PDF content
+            let pdfContent = `
+ELECTRICAL PROJECT ESTIMATE
+${currentEstimate.projectName || 'Untitled Project'}
+${'='.repeat(50)}
+
+`;
+
+            if (includeDescription) {
+                pdfContent += `Electrician: ${currentUser.name || 'Professional Electrician'}
+Email: ${currentUser.email || 'contact@electrician.com'}
+
+`;
+            }
+
+            if (includeDate) {
+                pdfContent += `Date: ${new Date().toLocaleDateString()}
+Time: ${new Date().toLocaleTimeString()}
+
+`;
+            }
+
+            if (includeTotals) {
+                pdfContent += `COST BREAKDOWN:
+${'-'.repeat(30)}
+Materials:              $${currentEstimate.materials.toFixed(2)}
+Labor (${currentEstimate.laborTime} hrs × $${currentEstimate.hourlyRate}): $${currentEstimate.laborCost.toFixed(2)}
+Subtotal:              $${currentEstimate.subtotal.toFixed(2)}
+Tax (8.5%):            $${currentEstimate.taxAmount.toFixed(2)}
+${'-'.repeat(30)}
+TOTAL:                 $${currentEstimate.total.toFixed(2)}
+
+`;
+            }
+
+            pdfContent += `
+Project Details:
+- Estimated completion time: ${currentEstimate.laborTime} hours
+- Hourly rate: $${currentEstimate.hourlyRate}
+- Materials and labor included
+- All work performed to code
+
+`;
+
+            if (includeSignature) {
+                pdfContent += `
+Customer Approval:
+
+Signature: ________________________    Date: __________
+
+Name: _____________________________
+
+`;
+            }
+
+            pdfContent += `
+Thank you for choosing our electrical services!
+
+Generated on: ${new Date().toLocaleString()}
+`;
+
+            // Create and download the file
+            const blob = new Blob([pdfContent], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentEstimate.projectName || 'estimate'}_${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            // ✅ NEW: Add to Recent Projects after successful PDF generation
+            const completedProject = addToRecentProjects(currentEstimate);
+
+            // Show success messages
+            const successMessage = document.getElementById('successMessage');
+            const completionNotice = document.getElementById('projectCompletionNotice');
+            
+            successMessage.style.display = 'block';
+            completionNotice.style.display = 'block';
+
+            // Hide success message after 3 seconds, keep completion notice longer
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+
+            setTimeout(() => {
+                completionNotice.style.display = 'none';
+            }, 8000);
+
+            // Optional: Clear current estimate since project is now completed
+            // localStorage.removeItem('currentEstimate');
+        }
+
+        // Form submission
+        document.getElementById('pdfForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generatePDF();
+        });
+
+        // Add event listeners for preview updates
+        document.getElementById('include_totals').addEventListener('change', updatePreview);
+        document.getElementById('include_description').addEventListener('change', updatePreview);
+        document.getElementById('include_date').addEventListener('change', updatePreview);
+        document.getElementById('include_signature').addEventListener('change', updatePreview);
+
+        // Navigation active state
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+
+        // Initialize page
+        displayCurrentEstimate();
+        updatePreview();
+    </script>
 </body>
 </html>
+
+
