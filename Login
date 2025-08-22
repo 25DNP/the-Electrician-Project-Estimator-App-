@@ -137,9 +137,9 @@
         // Check credentials
         if (username === 'DN' && password === 'AWESOME') {
             successDiv.style.display = 'block';
-            // In a real app, you would redirect to the main dashboard
+            // Redirect to Dashboard.html after successful login
             setTimeout(() => {
-                alert('Redirecting to project dashboard...');
+                window.location.href = 'Dashboard.html';
             }, 1500);
         } else {
             errorDiv.style.display = 'block';
