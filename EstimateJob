@@ -5,81 +5,419 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Estimate Job - Electrician Project Estimator</title>
 <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     body {
         font-family: Arial, sans-serif;
         background-color: #f5f5f5;
         display: flex;
-        justify-content: center;
-        align-items: center;
         height: 100vh;
     }
+
+    /* Sidebar Styles */
+    .sidebar {
+        width: 80px;
+        background-color: #e8e8e8;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        position: fixed;
+        height: 100vh;
+        left: 0;
+        top: 0;
+    }
+
+    .nav-item {
+        width: 50px;
+        height: 50px;
+        background-color: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 10px 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: #333;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .nav-item:hover {
+        background-color: #007BFF;
+        color: white;
+        transform: translateX(5px);
+    }
+
+    .nav-item.active {
+        background-color: #007BFF;
+        color: white;
+    }
+
+    .nav-item svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+    }
+
+    /* Main content */
+    .main-content {
+        margin-left: 80px;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
     .estimate-container {
         background-color: white;
-        padding: 20px;
+        padding: 30px;
         border-radius: 12px;
         box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
-        width: 320px;
+        width: 400px;
+        max-width: 100%;
     }
+
     h2 {
-        font-size: 18px;
-        margin-bottom: 15px;
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #333;
     }
+
     label {
         display: block;
         font-size: 14px;
-        margin-top: 10px;
+        margin-top: 15px;
         margin-bottom: 5px;
+        color: #555;
+        font-weight: 500;
     }
+
     input[type="text"], input[type="number"] {
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         margin: 5px 0;
-        border-radius: 5px;
-        border: 1px solid #ccc;
+        border-radius: 6px;
+        border: 2px solid #ddd;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus {
+        outline: none;
+        border-color: #007BFF;
+    }
+
+    .cost-section {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border-left: 4px solid #007BFF;
+    }
+
+    .cost-breakdown {
+        margin-bottom: 15px;
+    }
+
+    .cost-item {
+        display: flex;
+        justify-content: space-between;
+        margin: 8px 0;
+        color: #666;
         font-size: 14px;
     }
-    .cost {
-        font-size: 16px;
+
+    .total-cost {
+        font-size: 20px;
         font-weight: bold;
+        color: #007BFF;
+        text-align: center;
+        border-top: 2px solid #ddd;
+        padding-top: 15px;
         margin-top: 15px;
     }
+
     button {
         width: 100%;
-        padding: 12px;
-        margin-top: 15px;
+        padding: 14px;
+        margin-top: 20px;
         font-size: 16px;
         border: none;
         border-radius: 6px;
         cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
     }
+
     .btn-primary {
         background-color: #007BFF;
         color: white;
     }
+
     .btn-primary:hover {
         background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        margin-top: 10px;
+    }
+
+    .btn-secondary:hover {
+        background-color: #545b62;
+    }
+
+    .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+        border: 1px solid #c3e6cb;
+        display: none;
+        text-align: center;
+    }
+
+    .project-name-section {
+        margin-bottom: 20px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 60px;
+        }
+        .main-content {
+            margin-left: 60px;
+        }
+        .nav-item {
+            width: 40px;
+            height: 40px;
+        }
+        .estimate-container {
+            width: 90%;
+            padding: 20px;
+        }
     }
 </style>
 </head>
 <body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <a href="Dashboard.html" class="nav-item" title="Dashboard">
+            <svg viewBox="0 0 24 24">
+                <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+            </svg>
+        </a>
+        
+        <a href="JobEstimate.html" class="nav-item active" title="Job Estimate">
+            <svg viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+        </a>
+        
+        <a href="ExportPDF.html" class="nav-item" title="Export PDF">
+            <svg viewBox="0 0 24 24">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+            </svg>
+        </a>
+        <a href="RecentProjects.html" class="nav-item" title="Recent Projects">
+    <!-- Clock/Recent Icon -->
+             <svg viewBox="0 0 24 24">
+                 <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.2,16.2L11,13V7H12.5V12.2L17,14.9L16.2,16.2Z"/>
+             </svg>
+        </a>
+    </div>
 
-<div class="estimate-container">
-    <h2>Estimate Job</h2>
-    <form action="/estimate" method="POST">
-        <label for="materials">Materials</label>
-        <input type="number" id="materials" name="materials" placeholder="Enter material cost" required>
-        
-        <label for="labor_time">Labor time</label>
-        <input type="number" id="labor_time" name="labor_time" placeholder="Enter hours" required>
-        
-        <label for="rate">Hourly Rate</label>
-        <input type="number" id="rate" name="rate" placeholder="Enter hourly rate" required>
-        
-        <div class="cost">Cost: $0.00</div>
-        
-        <button type="submit" class="btn-primary">Save & Generate PDF</button>
-    </form>
-</div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="estimate-container">
+            <h2>⚡ Job Estimate Calculator</h2>
+            
+            <div id="successMessage" class="success-message">
+                Estimate saved successfully! You can now export it as PDF.
+            </div>
 
+            <form id="estimateForm">
+                <div class="project-name-section">
+                    <label for="project_name">Project Name</label>
+                    <input type="text" id="project_name" name="project_name" placeholder="e.g., Kitchen Outlet Installation" required>
+                </div>
+
+                <label for="materials">Material Costs ($)</label>
+                <input type="number" id="materials" name="materials" placeholder="0.00" step="0.01" min="0" required>
+                
+                <label for="labor_time">Labor Time (hours)</label>
+                <input type="number" id="labor_time" name="labor_time" placeholder="0.0" step="0.25" min="0" required>
+                
+                <label for="rate">Hourly Rate ($)</label>
+                <input type="number" id="rate" name="rate" placeholder="85.00" step="0.01" min="0" required>
+                
+                <div class="cost-section">
+                    <div class="cost-breakdown">
+                        <div class="cost-item">
+                            <span>Materials:</span>
+                            <span id="materialCost">$0.00</span>
+                        </div>
+                        <div class="cost-item">
+                            <span>Labor (<span id="laborHours">0</span> hrs × $<span id="laborRate">0</span>):</span>
+                            <span id="laborCost">$0.00</span>
+                        </div>
+                        <div class="cost-item">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">$0.00</span>
+                        </div>
+                        <div class="cost-item">
+                            <span>Tax (8.5%):</span>
+                            <span id="taxAmount">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="total-cost">
+                        Total: <span id="totalCost">$0.00</span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary">💾 Save Estimate</button>
+                <button type="button" class="btn-secondary" onclick="window.location.href='ExportPDF.html'">📄 Export PDF</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Get form elements
+        const materialsInput = document.getElementById('materials');
+        const laborTimeInput = document.getElementById('labor_time');
+        const rateInput = document.getElementById('rate');
+        const form = document.getElementById('estimateForm');
+
+        // Cost display elements
+        const materialCostSpan = document.getElementById('materialCost');
+        const laborHoursSpan = document.getElementById('laborHours');
+        const laborRateSpan = document.getElementById('laborRate');
+        const laborCostSpan = document.getElementById('laborCost');
+        const subtotalSpan = document.getElementById('subtotal');
+        const taxAmountSpan = document.getElementById('taxAmount');
+        const totalCostSpan = document.getElementById('totalCost');
+
+        const taxRate = 0.085; // 8.5% tax
+
+        // Real-time calculation function
+        function calculateEstimate() {
+            const materials = parseFloat(materialsInput.value) || 0;
+            const laborTime = parseFloat(laborTimeInput.value) || 0;
+            const hourlyRate = parseFloat(rateInput.value) || 0;
+
+            const laborCost = laborTime * hourlyRate;
+            const subtotal = materials + laborCost;
+            const taxAmount = subtotal * taxRate;
+            const total = subtotal + taxAmount;
+
+            // Update display
+            materialCostSpan.textContent = '$' + materials.toFixed(2);
+            laborHoursSpan.textContent = laborTime.toFixed(2);
+            laborRateSpan.textContent = hourlyRate.toFixed(2);
+            laborCostSpan.textContent = '$' + laborCost.toFixed(2);
+            subtotalSpan.textContent = '$' + subtotal.toFixed(2);
+            taxAmountSpan.textContent = '$' + taxAmount.toFixed(2);
+            totalCostSpan.textContent = '$' + total.toFixed(2);
+
+            return {
+                materials,
+                laborTime,
+                hourlyRate,
+                laborCost,
+                subtotal,
+                taxAmount,
+                total
+            };
+        }
+
+        // Add event listeners for real-time calculation
+        materialsInput.addEventListener('input', calculateEstimate);
+        laborTimeInput.addEventListener('input', calculateEstimate);
+        rateInput.addEventListener('input', calculateEstimate);
+
+        // Load saved hourly rate if available
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        if (currentUser.hourlyRate) {
+            rateInput.value = currentUser.hourlyRate;
+        } else {
+            rateInput.value = '85.00'; // Default rate
+        }
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const projectName = document.getElementById('project_name').value;
+            const estimate = calculateEstimate();
+
+            // Create estimate object
+            const newEstimate = {
+                id: Date.now(),
+                projectName: projectName,
+                materials: estimate.materials,
+                laborTime: estimate.laborTime,
+                hourlyRate: estimate.hourlyRate,
+                laborCost: estimate.laborCost,
+                subtotal: estimate.subtotal,
+                taxAmount: estimate.taxAmount,
+                total: estimate.total,
+                createdAt: new Date().toISOString(),
+                createdBy: currentUser.name || 'Unknown'
+            };
+
+            // Save to localStorage (simulating database)
+            let estimates = JSON.parse(localStorage.getItem('estimates') || '[]');
+            estimates.push(newEstimate);
+            localStorage.setItem('estimates', JSON.stringify(estimates));
+
+            // Save current estimate for PDF export
+            localStorage.setItem('currentEstimate', JSON.stringify(newEstimate));
+
+            // Update user's hourly rate
+            if (currentUser.email) {
+                currentUser.hourlyRate = estimate.hourlyRate;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+
+            // Show success message
+            const successMessage = document.getElementById('successMessage');
+            successMessage.style.display = 'block';
+
+            // Scroll to top to show message
+            successMessage.scrollIntoView({ behavior: 'smooth' });
+
+            // Hide message after 3 seconds
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+        });
+
+        // Initial calculation
+        calculateEstimate();
+
+        // Navigation active state
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
 </body>
 </html>
